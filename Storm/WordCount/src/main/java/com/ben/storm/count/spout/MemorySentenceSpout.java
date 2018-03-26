@@ -6,7 +6,7 @@ import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichSpout;
 import backtype.storm.tuple.Fields;
 import backtype.storm.utils.Utils;
-import org.joda.time.DateTime;
+import org.apache.storm.shade.org.joda.time.DateTime;
 
 import java.util.Map;
 import java.util.Random;
