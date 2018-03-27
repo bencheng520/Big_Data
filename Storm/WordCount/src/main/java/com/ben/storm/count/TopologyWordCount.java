@@ -1,15 +1,16 @@
 package com.ben.storm.count;
 
-import backtype.storm.Config;
-import backtype.storm.LocalCluster;
-import backtype.storm.StormSubmitter;
-import backtype.storm.topology.TopologyBuilder;
-import backtype.storm.tuple.Fields;
 import com.ben.storm.count.blot.FinalBolt;
 import com.ben.storm.count.blot.MemoryCountWordBolt;
 import com.ben.storm.count.blot.MemoryWordSplitBolt;
 import com.ben.storm.count.blot.SumWordBolt;
+import com.ben.storm.count.spout.FileSentenceSpout;
 import com.ben.storm.count.spout.MemorySentenceSpout;
+import org.apache.storm.Config;
+import org.apache.storm.LocalCluster;
+import org.apache.storm.StormSubmitter;
+import org.apache.storm.topology.TopologyBuilder;
+import org.apache.storm.tuple.Fields;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,8 +25,15 @@ public class TopologyWordCount {
 
     public static void main(String[] args) throws  Exception {
         TopologyBuilder builder=new TopologyBuilder();
-        //设置数据源
-        builder.setSpout("spout",new MemorySentenceSpout(),1);
+        if(args.length == 3){
+            if("file".equals(args[1])){
+                //设置数据源
+                builder.setSpout("spout",new FileSentenceSpout(),1);
+            }
+        }else{
+            //设置数据源
+            builder.setSpout("spout",new MemorySentenceSpout(),1);
+        }
         //读取spout数据源的数据，进行split业务逻辑
         builder.setBolt("split",new MemoryWordSplitBolt(),1).shuffleGrouping("spout");
         //读取split后的数据，进行count (tick周期10秒)
@@ -39,9 +47,16 @@ public class TopologyWordCount {
         logger.info("TopologyWordCount args: {}", args);
         //集群模式
         if(args!=null&&args.length>0){
+            String topologyName = args[0];
+            if(args.length == 3){
+                if("file".equals(args[1])){
+                    String inputPath = args[2];
+                    config.put("INPUT_PATH", inputPath);
+                }
+            }
             config.setDebug(false);
             config.setNumWorkers(2);
-            StormSubmitter.submitTopology(args[0],config,builder.createTopology());
+            StormSubmitter.submitTopology(topologyName,config,builder.createTopology());
             //单机模式
         }else{
             config.setDebug(true);

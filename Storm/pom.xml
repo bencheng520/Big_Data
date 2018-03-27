@@ -17,7 +17,8 @@
     </modules>
 
     <properties>
-        <version.storm>0.10.0</version.storm>
+        <!--<version.storm>0.10.0</version.storm>-->
+        <version.storm>1.0.3</version.storm>
     </properties>
 
 
