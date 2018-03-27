@@ -6,6 +6,8 @@ import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Tuple;
 import org.apache.storm.shade.org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 
@@ -16,6 +18,8 @@ import java.util.Map;
  */
 public class FinalBolt extends BaseRichBolt {
 
+    private static final Logger logger = LoggerFactory.getLogger(FinalBolt.class);
+
     public void prepare(Map map, TopologyContext topologyContext, OutputCollector outputCollector) {
 
     }
@@ -23,10 +27,10 @@ public class FinalBolt extends BaseRichBolt {
     public void execute(Tuple tuple) {
 
         //        最终的结果打印bolt
-        System.out.println(new DateTime().toString("yyyy-MM-dd HH:mm:ss")+"  final bolt ");
+     //   logger.info(new DateTime().toString("yyyy-MM-dd HH:mm:ss")+"  final bolt ");
         Map<String,Integer> counts= (Map<String, Integer>) tuple.getValue(0);
         for(Map.Entry<String,Integer> kv:counts.entrySet()){
-            System.out.println(kv.getKey()+"  "+kv.getValue());
+            logger.info("final:{}",kv.getKey()+"  "+kv.getValue());
         }
         //实际应用中，最后一个阶段，大部分应该是持久化到mysql，redis，es，solr或mongodb中
 

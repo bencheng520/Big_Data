@@ -10,6 +10,8 @@ import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
 import com.ben.storm.count.util.TupleHelpers;
 import org.apache.storm.shade.org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -20,6 +22,8 @@ import java.util.Map;
  * @Description ${DESCRIPTION}
  */
 public class MemoryCountWordBolt extends BaseRichBolt {
+
+    private static final Logger logger = LoggerFactory.getLogger(MemoryCountWordBolt.class);
 
     Map<String,Integer> counts=new HashMap<String,Integer>();
 
@@ -40,7 +44,7 @@ public class MemoryCountWordBolt extends BaseRichBolt {
         //时间窗口定义为10s内的统计数据，统计完毕后，发射到下一阶段的bolt进行处理
         //发射完成后retun结束，开始新一轮的时间窗口计数操作
         if(TupleHelpers.isTickTuple(tuple)){
-            System.out.println(new DateTime().toString("yyyy-MM-dd HH:mm:ss")+" 每隔10s发射一次map 大小："+counts.size());
+            logger.info("count: {}",counts.size());
 //            Map<String,Integer> copyMap= (Map<String, Integer>) deepCopy(counts);
             outputCollector.emit(new Values(counts));//10S发射一次
 
@@ -50,7 +54,7 @@ public class MemoryCountWordBolt extends BaseRichBolt {
         }
 
         //如果没到发射时间，就继续统计wordcount
-        System.out.println("线程"+Thread.currentThread().getName()+"  map 缓冲统计中......  map size："+counts.size());
+     //   logger.info("线程"+Thread.currentThread().getName()+"  map 缓冲统计中......  map size："+counts.size());
         //String word=tuple.getString(0);//如果有多tick，就不用使用这种方式获取tuple里面的数据
         String word=tuple.getStringByField("word");
         Integer count=counts.get(word);

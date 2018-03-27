@@ -9,7 +9,10 @@ import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
 import com.ben.storm.count.util.TupleHelpers;
+import org.apache.storm.shade.org.eclipse.jetty.util.ajax.JSON;
 import org.apache.storm.shade.org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -19,7 +22,9 @@ import java.util.Map;
  * @Date 2018/3/26 23:30
  * @Description ${DESCRIPTION}
  */
-public class SumWordBlot extends BaseRichBolt {
+public class SumWordBolt extends BaseRichBolt {
+
+    private static final Logger logger = LoggerFactory.getLogger(SumWordBolt.class);
 
     private  OutputCollector outputCollector;
 
@@ -39,8 +44,7 @@ public class SumWordBlot extends BaseRichBolt {
     public void execute(Tuple tuple) {
         //tick时间窗口3秒后，发射到下一阶段的bolt，仅为测试用，故多加了这个bolt逻辑
         if(TupleHelpers.isTickTuple(tuple)){
-            System.out.println(new DateTime().toString("yyyy-MM-dd HH:mm:ss")+"  showbolt间隔  应该是 3 秒后 ");
-//        System.out.println("what: "+tuple.getValue(0)+"  "+tuple.getFields().toList());
+            logger.info("sum:{}", JSON.toString(counts));
             outputCollector.emit(new Values(counts));
             return;
         }
