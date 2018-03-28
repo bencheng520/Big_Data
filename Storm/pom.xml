@@ -18,7 +18,8 @@
 
     <properties>
         <!--<version.storm>0.10.0</version.storm>-->
-        <version.storm>1.0.3</version.storm>
+        <version.storm>1.0.5</version.storm>
+        <version.storm.kafka.client>1.0.5</version.storm.kafka.client>
     </properties>
 
 

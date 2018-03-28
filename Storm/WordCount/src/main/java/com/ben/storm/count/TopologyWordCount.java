@@ -4,11 +4,14 @@ import com.ben.storm.count.blot.FinalBolt;
 import com.ben.storm.count.blot.MemoryCountWordBolt;
 import com.ben.storm.count.blot.MemoryWordSplitBolt;
 import com.ben.storm.count.blot.SumWordBolt;
+import com.ben.storm.count.spout.BuildKafkaSpout;
 import com.ben.storm.count.spout.FileSentenceSpout;
 import com.ben.storm.count.spout.MemorySentenceSpout;
 import org.apache.storm.Config;
 import org.apache.storm.LocalCluster;
 import org.apache.storm.StormSubmitter;
+import org.apache.storm.kafka.spout.KafkaSpout;
+import org.apache.storm.kafka.spout.KafkaSpoutConfig;
 import org.apache.storm.topology.TopologyBuilder;
 import org.apache.storm.tuple.Fields;
 import org.slf4j.Logger;
@@ -29,6 +32,10 @@ public class TopologyWordCount {
             if("file".equals(args[1])){
                 //设置数据源
                 builder.setSpout("spout",new FileSentenceSpout(),1);
+            }else if("kafka".equals(args[1])){
+                //brokerUrl: 10.204.243.38:9092,10.204.243.39:9092,10.204.243.40:9092
+                KafkaSpout<String, String> kafkaSpout = new BuildKafkaSpout("brokerUrl", "testGroup", "testTopic").build(KafkaSpoutConfig.FirstPollOffsetStrategy.UNCOMMITTED_LATEST);
+                builder.setSpout("spout",kafkaSpout,1);
             }
         }else{
             //设置数据源
