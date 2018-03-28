@@ -2,7 +2,9 @@ package com.ben.storm.count.blot;
 
 import org.apache.storm.task.OutputCollector;
 import org.apache.storm.task.TopologyContext;
+import org.apache.storm.topology.BasicOutputCollector;
 import org.apache.storm.topology.OutputFieldsDeclarer;
+import org.apache.storm.topology.base.BaseBasicBolt;
 import org.apache.storm.topology.base.BaseRichBolt;
 import org.apache.storm.tuple.Fields;
 import org.apache.storm.tuple.Tuple;
@@ -17,23 +19,21 @@ import java.util.Map;
  * @Date 2018/3/26 21:12
  * @Description ${DESCRIPTION}
  */
-public class MemoryWordSplitBolt extends BaseRichBolt {
+public class MemoryWordSplitBolt extends BaseBasicBolt {
 
     private static final Logger logger = LoggerFactory.getLogger(MemoryWordSplitBolt.class);
 
-    private OutputCollector outputCollector;
-
     public void prepare(Map map, TopologyContext topologyContext, OutputCollector outputCollector) {
-        this.outputCollector = outputCollector;
+
     }
 
-    public void execute(Tuple tuple) {
+    public void execute(Tuple tuple, BasicOutputCollector basicOutputCollector) {
         String sentence = tuple.getString(0);
         logger.info("split-----: {}", sentence);
         //        简单的按照空格进行切分后，发射到下一阶段bolt
         for(String word:sentence.split(" ")){
             logger.info("split=====: {}", word);
-            outputCollector.emit(new Values(word));//发送split
+            basicOutputCollector.emit(new Values(word));//发送split
         }
     }
 

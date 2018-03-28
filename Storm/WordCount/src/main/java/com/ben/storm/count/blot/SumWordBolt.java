@@ -5,7 +5,9 @@ import org.apache.storm.Config;
 import org.apache.storm.shade.org.eclipse.jetty.util.ajax.JSON;
 import org.apache.storm.task.OutputCollector;
 import org.apache.storm.task.TopologyContext;
+import org.apache.storm.topology.BasicOutputCollector;
 import org.apache.storm.topology.OutputFieldsDeclarer;
+import org.apache.storm.topology.base.BaseBasicBolt;
 import org.apache.storm.topology.base.BaseRichBolt;
 import org.apache.storm.tuple.Fields;
 import org.apache.storm.tuple.Tuple;
@@ -21,11 +23,9 @@ import java.util.Map;
  * @Date 2018/3/26 23:30
  * @Description ${DESCRIPTION}
  */
-public class SumWordBolt extends BaseRichBolt {
+public class SumWordBolt extends BaseBasicBolt {
 
     private static final Logger logger = LoggerFactory.getLogger(SumWordBolt.class);
-
-    private OutputCollector outputCollector;
 
     @Override
     public Map<String, Object> getComponentConfiguration() {
@@ -35,16 +35,16 @@ public class SumWordBolt extends BaseRichBolt {
     }
 
     public void prepare(Map map, TopologyContext topologyContext, OutputCollector outputCollector) {
-        this.outputCollector = outputCollector;
+
     }
 
     Map<String,Integer> counts=new HashMap<String,Integer>();
 
-    public void execute(Tuple tuple) {
+    public void execute(Tuple tuple, BasicOutputCollector basicOutputCollector) {
         //tick时间窗口3秒后，发射到下一阶段的bolt，仅为测试用，故多加了这个bolt逻辑
         if(TupleHelpers.isTickTuple(tuple)){
             logger.info("sum:{}", JSON.toString(counts));
-            outputCollector.emit(new Values(counts));
+            basicOutputCollector.emit(new Values(counts));
             return;
         }
 

@@ -19,8 +19,10 @@ public class FinalBolt extends BaseRichBolt {
 
     private static final Logger logger = LoggerFactory.getLogger(FinalBolt.class);
 
-    public void prepare(Map map, TopologyContext topologyContext, OutputCollector outputCollector) {
+    private OutputCollector outputCollector;
 
+    public void prepare(Map map, TopologyContext topologyContext, OutputCollector outputCollector) {
+        outputCollector = outputCollector;
     }
 
     public void execute(Tuple tuple) {
@@ -32,6 +34,9 @@ public class FinalBolt extends BaseRichBolt {
             logger.info("final:{}",kv.getKey()+"  "+kv.getValue());
         }
         //实际应用中，最后一个阶段，大部分应该是持久化到mysql，redis，es，solr或mongodb中
+
+
+        outputCollector.ack(tuple);
 
     }
 

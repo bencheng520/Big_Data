@@ -4,7 +4,9 @@ import com.ben.storm.count.util.TupleHelpers;
 import org.apache.storm.Config;
 import org.apache.storm.task.OutputCollector;
 import org.apache.storm.task.TopologyContext;
+import org.apache.storm.topology.BasicOutputCollector;
 import org.apache.storm.topology.OutputFieldsDeclarer;
+import org.apache.storm.topology.base.BaseBasicBolt;
 import org.apache.storm.topology.base.BaseRichBolt;
 import org.apache.storm.tuple.Fields;
 import org.apache.storm.tuple.Tuple;
@@ -20,13 +22,11 @@ import java.util.Map;
  * @Date 2018/3/26 21:16
  * @Description ${DESCRIPTION}
  */
-public class MemoryCountWordBolt extends BaseRichBolt {
+public class MemoryCountWordBolt extends BaseBasicBolt {
 
     private static final Logger logger = LoggerFactory.getLogger(MemoryCountWordBolt.class);
 
     Map<String,Integer> counts=new HashMap<String,Integer>();
-
-    private OutputCollector outputCollector;
 
     @Override
     public Map<String, Object> getComponentConfiguration() {
@@ -36,16 +36,16 @@ public class MemoryCountWordBolt extends BaseRichBolt {
     }
 
     public void prepare(Map map, TopologyContext topologyContext, OutputCollector outputCollector) {
-        this.outputCollector = outputCollector;
+
     }
 
-    public void execute(Tuple tuple) {
+    public void execute(Tuple tuple, BasicOutputCollector basicOutputCollector) {
         //时间窗口定义为10s内的统计数据，统计完毕后，发射到下一阶段的bolt进行处理
         //发射完成后retun结束，开始新一轮的时间窗口计数操作
         if(TupleHelpers.isTickTuple(tuple)){
             logger.info("count: {}",counts.size());
 //            Map<String,Integer> copyMap= (Map<String, Integer>) deepCopy(counts);
-            outputCollector.emit(new Values(counts));//10S发射一次
+            basicOutputCollector.emit(new Values(counts));//10S发射一次
 
 //            counts.clear();
             counts=new HashMap<String,Integer>();//这个地方，不能执行clear方法，可以再new一个对象，否则下游接受的数据，有可能为空 或者深度copy也行，推荐new
